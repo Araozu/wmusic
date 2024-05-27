@@ -1,27 +1,36 @@
-import { createSignal } from "solid-js";
+import { Show, createSignal } from "solid-js";
 import { Login as GoLogin } from "../../wailsjs/go/main/App";
+import { useNavigate } from "@solidjs/router";
 
 export function Login() {
     const [loading, setLoading] = createSignal(false);
+    const [error, setError] = createSignal("");
     const [server, setServer] = createSignal("");
     const [username, setUsername] = createSignal("");
     const [password, setPassword] = createSignal("");
+    const [fade, setFade] = createSignal(false);
+    const navigate = useNavigate();
 
     const login = async(ev: Event) => {
         ev.preventDefault();
         setLoading(true);
+        setError("");
 
-        const success = await GoLogin(server(), username(), password());
-        if (success) {
-            alert(":D");
-        } else {
-            alert("D:");
-        }
-        setLoading(false);
+        GoLogin(server(), username(), password())
+            .then(() => {
+                setFade(true);
+                setTimeout(() => {
+                    navigate("/home");
+                }, 150);
+            })
+            .catch((err) => {
+                setError(err);
+                setLoading(false);
+            });
     };
 
     return (
-        <div class="w-screen h-screen flex items-center justify-center">
+        <div class={`w-screen h-screen flex items-center justify-center ${fade() ? "opacity-0" : "opacity-100"} transition-opacity`}>
             <div class="w-80">
                 <form onSubmit={login} >
                     <h1 class="text-center font-black text-xl">Login</h1>
@@ -65,6 +74,12 @@ export function Login() {
                     <div class="text-center">
                         <button type="submit" class="btn btn-primary">Login</button>
                     </div>
+
+                    <Show when={error() !== ""}>
+                        <div role="alert" class="alert alert-error">
+                            <span class="text-white">Error: {error()}</span>
+                        </div>
+                    </Show>
                 </form>
             </div>
         </div>

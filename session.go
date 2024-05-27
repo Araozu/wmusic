@@ -1,9 +1,9 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"log"
-	"time"
 
 	"github.com/go-resty/resty/v2"
 )
@@ -15,15 +15,15 @@ type AuthSuccess struct {
 	SubsonicSalt  string `json:"subsonicSalt"`
 	SubsonicToken string `json:"subsonicToken"`
 	Token         string `json:"token"`
-	Username      string `json:"fernando"`
+	Username      string `json:"username"`
 }
 
 type AuthError struct {
 	Error string `json:"error"`
 }
 
-// / (Tries to) login to a remote navidrome server
-func (a *App) Login(server, username, password string) bool {
+// (Tries to) login to a remote navidrome server
+func (a *App) Login(server, username, password string) (bool, error) {
 	client := resty.New()
 
 	// TODO: check server for leading https and ending /, normalize
@@ -40,19 +40,17 @@ func (a *App) Login(server, username, password string) bool {
 
 	if err != nil {
 		log.Print("Login error", err)
-		return false
+		return false, err
 	}
 
 	if response.IsSuccess() {
 		log.Printf("%+v", successData)
-		return true
+		return true, nil
 	} else if response.IsError() {
 		log.Printf("%+v", errorData)
-		return false
+		return false, errors.New(errorData.Error + ".")
+	} else {
+		log.Printf("ehhh???")
+		return false, errors.New("invalid state")
 	}
-
-	log.Print("Login: ", server, username, password)
-	time.Sleep(1 * time.Second)
-
-	return true
 }
