@@ -1,22 +1,13 @@
+import { Route, HashRouter as Router } from "@solidjs/router";
 import type { Component } from "solid-js";
+
+import { Login } from "./routes/Login";
 
 const App: Component = () => (
     <div>
-        <header >
-            <p>
-                Edit <code>src/App.tsx</code> and save to reload.
-            </p>
-            <a
-                href="https://github.com/solidjs/solid"
-                target="_blank"
-                rel="noopener noreferrer"
-            >
-                Learn Solid
-            </a>
-            <button class="btn btn-primary">
-                AAAA
-            </button>
-        </header>
+        <Router>
+            <Route path="/" component={Login} />
+        </Router>
     </div>
 );
 
