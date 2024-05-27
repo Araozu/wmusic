@@ -1,0 +1,30 @@
+{
+  "name": "my-wails-solid",
+  "version": "0.0.0",
+  "description": "",
+  "scripts": {
+    "start": "vite",
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.4.1",
+    "@typescript-eslint/parser": "^6.4.1",
+    "autoprefixer": "^10.4.19",
+    "eslint": "^8.47.0",
+    "eslint-plugin-react": "^7.33.2",
+    "postcss": "^8.4.38",
+    "solid-devtools": "^0.29.2",
+    "tailwindcss": "^3.4.3",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.11",
+    "vite-plugin-solid": "^2.8.2"
+  },
+  "dependencies": {
+    "@solidjs/router": "^0.13.3",
+    "solid-js": "^1.8.11"
+  },
+  "author": "Araozu"
+}
