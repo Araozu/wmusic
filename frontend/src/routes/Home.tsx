@@ -37,10 +37,11 @@ function Album(props: { album: main.Album }) {
     return (
         <div class="inline-block mx-2 p-1 w-32 rounded bg-zinc-900">
             <img
-                class="inline-block rounded w-30 h-30 min-w-30 min-h-30"
+                class={`inline-block rounded w-30 h-30 min-w-30 min-h-30 transition-opacity ${coverBytes.state === "ready" ? "opacity-100" : "opacity-0"}`}
                 src={base64Image()}
                 alt=""
             />
+
             <br />
             <div class="text-sm overflow-hidden overflow-ellipsis pt-1">
                 {props.album.name}

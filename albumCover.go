@@ -95,7 +95,6 @@ func loadAlbumCover(albumId string) {
 	imgBytes := response.Body()
 
 	// Write the image to cache
-	log.Printf("write %s: %+v", albumId, imgBytes[:10])
 	err = os.WriteFile(albumCacheFile, imgBytes, 0644)
 	if err != nil {
 		coverInfo.Error = errors.New("error writing album cover to disk")
@@ -130,6 +129,5 @@ func (a *App) GetAlbumCover(albumId string) ([]byte, error) {
 		return nil, errors.New("error reading cover file")
 	}
 
-	log.Printf("%s : %+v", albumId, bytes[:10])
 	return bytes, nil
 }
