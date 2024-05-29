@@ -1,5 +1,5 @@
-import { For, createResource, createSignal, onMount } from "solid-js";
-import { GetRandomAlbums } from "../../wailsjs/go/main/App";
+import { For, createMemo, createResource, createSignal, onMount } from "solid-js";
+import { GetAlbumCover, GetRandomAlbums } from "../../wailsjs/go/main/App";
 import { main } from "../../wailsjs/go/models";
 
 export function Home() {
@@ -24,11 +24,21 @@ export function Home() {
 }
 
 function Album(props: { album: main.Album }) {
+    const [coverBytes] = createResource(async() => await GetAlbumCover(props.album.id));
+
+    const base64Image = createMemo(() => {
+        if (coverBytes.state !== "ready") return "";
+
+        // At runtime this is a string, not a number array
+        const bytes = coverBytes() as unknown as string;
+        return `data:;base64,${bytes}`;
+    });
+
     return (
         <div class="inline-block mx-2 p-1 w-32 rounded bg-zinc-900">
             <img
                 class="inline-block rounded w-30 h-30 min-w-30 min-h-30"
-                src={props.album.mediumImageUrl}
+                src={base64Image()}
                 alt=""
             />
             <br />

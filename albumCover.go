@@ -21,6 +21,14 @@ type AlbumCoverInfo struct {
 var albumCoverCacheInfo = make(map[string]*AlbumCoverInfo)
 var cacheMutex = sync.RWMutex{}
 
+func generateCacheFilename(albumId string) string {
+	albumCacheFile, err := xdg.CacheFile(fmt.Sprintf("%s/%s", appname, albumId))
+	if err != nil {
+		panic(fmt.Sprint("error creating cacheFile url: ", err))
+	}
+	return albumCacheFile
+}
+
 // Loads a single album cover and caches it in XDG_CACHE_HOME
 // First it checks if the cover already exists in XDG_CACHE_HOME
 // If it doesn't, loads it and stores it
@@ -34,13 +42,10 @@ func loadAlbumCover(albumId string) {
 		return
 	}
 
-	albumCacheFile, err := xdg.CacheFile(fmt.Sprintf("%s/%s", appname, albumId))
-	if err != nil {
-		panic(fmt.Sprint("error creating cacheFile url: ", err))
-	}
+	albumCacheFile := generateCacheFilename(albumId)
 
 	// Attempt to read file
-	if _, err = os.Stat(albumCacheFile); err != nil {
+	if _, err := os.Stat(albumCacheFile); err == nil {
 		// File exists
 		log.Print("album cover: cache hit (disk): ", albumId)
 		cacheMutex.Lock()
@@ -90,6 +95,7 @@ func loadAlbumCover(albumId string) {
 	imgBytes := response.Body()
 
 	// Write the image to cache
+	log.Printf("write %s: %+v", albumId, imgBytes[:10])
 	err = os.WriteFile(albumCacheFile, imgBytes, 0644)
 	if err != nil {
 		coverInfo.Error = errors.New("error writing album cover to disk")
@@ -98,4 +104,32 @@ func loadAlbumCover(albumId string) {
 	}
 
 	log.Print("Loading albumCover for ", albumId, " successful")
+}
+
+// Tries to load the album cover
+func (a *App) GetAlbumCover(albumId string) ([]byte, error) {
+	cacheMutex.Lock()
+	coverInfo, ok := albumCoverCacheInfo[albumId]
+	cacheMutex.Unlock()
+	if !ok {
+		panic("Illegal state: Tried to load an album, but it wasn't on memory cache")
+	}
+
+	coverInfo.WaitGroup.Wait()
+
+	if coverInfo.Error != nil {
+		return nil, coverInfo.Error
+	}
+
+	// Read the file
+	filename := generateCacheFilename(albumId)
+	log.Print("reading: ", filename)
+	bytes, err := os.ReadFile(filename)
+	if err != nil {
+		log.Fatal("error getting album cover: ", err)
+		return nil, errors.New("error reading cover file")
+	}
+
+	log.Printf("%s : %+v", albumId, bytes[:10])
+	return bytes, nil
 }
