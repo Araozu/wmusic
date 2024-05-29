@@ -1,6 +1,6 @@
 import { For, createResource, createSignal, onMount } from "solid-js";
 import { GetRandomAlbums } from "../../wailsjs/go/main/App";
-import {main} from "../../wailsjs/go/models";
+import { main } from "../../wailsjs/go/models";
 
 export function Home() {
     const [hidden, setHidden] = createSignal(true);
@@ -8,13 +8,13 @@ export function Home() {
 
     onMount(() => {
         // Fade in the UI
-        setTimeout(() => setHidden(false) , 150);
+        setTimeout(() => setHidden(false), 150);
     });
-
 
     return (
         <div class={`min-h-screen ${hidden() ? "opacity-0" : "opacity-100"} transition-opacity`}>
-            <div class="py-10 h-64 overflow-scroll whitespace-nowrap">
+            <h1 class="font-black text-2xl pt-6 pb-4 pl-2">Random albums</h1>
+            <div class="pb-4 overflow-scroll whitespace-nowrap">
                 <For each={albums()}>
                     {(album) => <Album album={album} />}
                 </For>
@@ -23,7 +23,7 @@ export function Home() {
     );
 }
 
-function Album(props: {album: main.Album}) {
+function Album(props: { album: main.Album }) {
     return (
         <div class="inline-block mx-2 p-1 w-32 rounded bg-zinc-900">
             <img
