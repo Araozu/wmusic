@@ -1,6 +1,8 @@
 package main
 
-import "time"
+import (
+	"time"
+)
 
 // The result of a Login
 type AuthSuccess struct {

@@ -4,10 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"os"
 	"sync"
 
-	"github.com/adrg/xdg"
 	"github.com/go-resty/resty/v2"
 )
 
@@ -15,6 +13,7 @@ type AuthError struct {
 	Error string `json:"error"`
 }
 
+// Name of the app, used to create directories in XDG_<folder> and store files inside
 const appname = "wMusic"
 
 var LoggedUser AuthSuccess
@@ -107,49 +106,4 @@ func loadAlbums(serverUrl string) {
 			go loadAlbumCover(albumId)
 		}
 	}
-
-	// TODO: Do the loading
-}
-
-// Loads a single album cover and caches it in XDG_CACHE_HOME
-func loadAlbumCover(albumId string) {
-	log.Print("Loading albumCover for ", albumId)
-
-	response, err := client.R().
-		// TODO: replace `fernando` with the username
-		Get(fmt.Sprintf(
-			"%s/rest/getCoverArt.view?id=%s&u=fernando&s=12e7f3&t=%s&v=1.13.0&c=wmusic&size=300",
-			serverUrl,
-			albumId,
-			"d7bbe92d7da363aa202ae16136887adc",
-		))
-
-	if err != nil {
-		log.Print("error loadAlbumCover: ", err)
-		return
-	}
-
-	if !response.IsSuccess() {
-		log.Print("error loadAlbumCover")
-		log.Printf("%s", response.Body())
-		return
-	}
-
-	imgBytes := response.Body()
-
-	// Write the image to cache
-	// TODO: Actually check in cache if the album art exists
-	cacheFile, err := xdg.CacheFile(fmt.Sprintf("%s/%s", appname, albumId))
-
-	if err != nil {
-		log.Print("error loadAlbumCover - CacheFile:", err)
-		return
-	}
-
-	err = os.WriteFile(cacheFile, imgBytes, 0666)
-	if err != nil {
-		panic(fmt.Sprintf("Error writing to cache file for album cover: %s", cacheFile))
-	}
-
-	log.Print("Loading albumCover for ", albumId, " successful")
 }
