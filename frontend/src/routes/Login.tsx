@@ -72,7 +72,11 @@ export function Login() {
                     </label>
                     <br />
                     <div class="text-center">
-                        <button type="submit" class="btn btn-primary">Login</button>
+                        <button type="submit" class={`btn btn-primary ${loading() ? "animate-pulse" : ""}`}
+                            disabled={loading()}
+                        >
+                            Login
+                        </button>
                     </div>
 
                     <Show when={error() !== ""}>

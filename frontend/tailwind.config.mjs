@@ -5,6 +5,13 @@ export default {
     content: [
         "./src/**/*.{js,jsx,ts,tsx}",
     ],
+    theme: {
+        extend: {
+            spacing: {
+                "30": "7.5rem",
+            },
+        },
+    },
     plugins: [
         daisyui,
     ],
