@@ -107,6 +107,10 @@ func loadAlbumCover(albumId string) {
 
 // Tries to load the album cover
 func (a *App) GetAlbumCover(albumId string) ([]byte, error) {
+	if albumId == "" {
+		return nil, nil
+	}
+
 	cacheMutex.Lock()
 	coverInfo, ok := albumCoverCacheInfo[albumId]
 	cacheMutex.Unlock()

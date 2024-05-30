@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"sync"
+	"time"
 
 	"github.com/go-resty/resty/v2"
 )
@@ -55,7 +56,6 @@ func (a *App) Login(server, username, password string) (bool, error) {
 		// Set global session
 		LoggedUser = successData
 		// Begin to load the list of albums on the background
-		randomAlbumWaitGroup.Add(1)
 		go loadAlbums(server)
 
 		return true, nil
@@ -66,6 +66,11 @@ func (a *App) Login(server, username, password string) (bool, error) {
 		log.Printf("ehhh???")
 		return false, errors.New("invalid state")
 	}
+}
+
+// Triggers a reload of random albums
+func (a *App) LoadRandomAlbums() {
+	go loadAlbums(serverUrl)
 }
 
 // Waits for the random albums to be loaded, and returns them.
@@ -80,9 +85,12 @@ func (a *App) GetRandomAlbums() ([]Album, error) {
 
 // Loads a list of random albums from the server.
 func loadAlbums(serverUrl string) {
+	randomAlbumWaitGroup.Add(1)
 	defer randomAlbumWaitGroup.Done()
+
 	log.Print("begin loadAlbums")
-	client := resty.New()
+
+	time.Sleep(5 * time.Second)
 
 	var errorData AuthError
 	response, err := client.R().

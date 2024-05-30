@@ -8,4 +8,6 @@ export function GetRandomAlbums():Promise<Array<main.Album>>;
 
 export function Greet(arg1:string):Promise<string>;
 
+export function LoadRandomAlbums():Promise<void>;
+
 export function Login(arg1:string,arg2:string,arg3:string):Promise<boolean>;
