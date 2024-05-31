@@ -69,7 +69,7 @@ func (a *App) Login(server, username, password string) (bool, error) {
 }
 
 // Triggers a reload of random albums
-func (a *App) LoadRandomAlbums() {
+func (a *App) TriggerAlbumReload() {
 	go loadAlbums(serverUrl)
 }
 
