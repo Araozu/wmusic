@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"sync"
-	"time"
 
 	"github.com/go-resty/resty/v2"
 )
@@ -89,8 +88,6 @@ func loadAlbums(serverUrl string) {
 	defer randomAlbumWaitGroup.Done()
 
 	log.Print("begin loadAlbums")
-
-	time.Sleep(5 * time.Second)
 
 	var errorData AuthError
 	response, err := client.R().

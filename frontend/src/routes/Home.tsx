@@ -74,12 +74,15 @@ function Album(props: { albums: Array<main.Album | null>, idx: number }) {
     const [coverBytes, {mutate, refetch}] = createResource<Array<number> | null>(async() => GetAlbumCover(props.albums[props.idx]?.id ?? ""));
     const [albumName, setAlbumName] = createSignal("");
     const [artistName, setArtistName] = createSignal("");
+    const [imageBase64, setImageBase64] = createSignal("");
+    const [imgReady, setImgReady] = createSignal(false);
 
     const album = createMemo(() => props.albums[props.idx]);
 
     createEffect(() => {
         const a = album();
         if (a === null) {
+            setImgReady(false);
             mutate(null);
             return;
         } else {
@@ -90,31 +93,35 @@ function Album(props: { albums: Array<main.Album | null>, idx: number }) {
         refetch();
     });
 
-    const base64Image = createMemo(() => {
-        if (coverBytes.state !== "ready") return "";
-
-        // At runtime this is a string, not a number array
-        const bytes = coverBytes() as unknown as string;
-        return `data:;base64,${bytes}`;
+    createEffect(() => {
+        const status = coverBytes.state;
+        if (status === "ready") {
+            const bytes = coverBytes();
+            if (bytes === null) return;
+            console.log("new image pushed, ");
+            setImageBase64(`data:;base64,${coverBytes()}`);
+            setImgReady(true);
+        }
     });
 
     const isNull = createMemo(() => !album());
     const opacity = createMemo(() => `${isNull() ? "opacity-0" : "opacity-100"} transition-opacity`);
+    const imgOpacity = createMemo(() => (imgReady() && !isNull() ? "opacity-100" : "opacity-0"));
 
     return (
         <div class="inline-block mx-2 p-1 w-32 rounded bg-zinc-900">
             <div class="w-30 h-30" >
                 <img
-                    class={`inline-block rounded w-30 h-30 transition-opacity ${coverBytes.state === "ready" ? "opacity-100" : "opacity-0"}`}
-                    src={base64Image()}
+                    class={`inline-block rounded w-30 h-30 transition-opacity ${imgOpacity()}`}
+                    src={imageBase64()}
                     alt=""
                 />
             </div>
 
-            <div class={`text-sm overflow-hidden overflow-ellipsis pt-1 ${opacity()}`}>
+            <div class={`text-sm overflow-hidden overflow-ellipsis pt-1 ${opacity()}`} title={albumName()}>
                 {albumName()}
             </div>
-            <div class={`text-xs overflow-hidden overflow-ellipsis ${opacity()}`}>
+            <div class={`text-xs overflow-hidden overflow-ellipsis ${opacity()}`} title={artistName()}>
                 {artistName()}
             </div>
 
